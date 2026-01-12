@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Precificação Shopee</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      width: 320px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #ee4d2d;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    h2 {
+      text-align: center;
+    }
+    .resultado {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Precificação Shopee</h2>
+
+  <input type="number" id="custo" placeholder="Custo do produto (R$)">
+  <input type="number" id="embalagem" placeholder="Embalagem (R$)">
+  <input type="number" id="taxa" placeholder="Taxa Shopee (%)" value="20">
+  <input type="number" id="lucro" placeholder="Lucro desejado (%)" value="30">
+
+  <button onclick="calcular()">Calcular</button>
+
+  <div class="resultado" id="resultado"></div>
+</div>
+
+<script>
+function calcular() {
+  const custo = Number(document.getElementById('custo').value);
+  const embalagem = Number(document.getElementById('embalagem').value);
+  const taxa = Number(document.getElementById('taxa').value);
+  const lucro = Number(document.getElementById('lucro').value);
+
+  const total = custo + embalagem;
+  const preco = total / (1 - (taxa + lucro) / 100);
+  const lucroReal = preco - total - (preco * taxa / 100);
+
+  document.getElementById('resultado').innerHTML = `
+    Preço de venda: R$ ${preco.toFixed(2)} <br>
+    Lucro estimado: R$ ${lucroReal.toFixed(2)}
+  `;
+}
+</script>
+
+</body>
+</html>
+
