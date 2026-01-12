@@ -2,80 +2,148 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Precificação Shopee</title>
+  <title>Precificação Shopee – Completa</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      background: #f4f4f4;
+      padding: 20px;
     }
-    .box {
-      background: white;
+    h1 {
+      text-align: center;
+      color: #ee4d2d;
+    }
+    .container {
+      background: #fff;
       padding: 20px;
       border-radius: 12px;
-      width: 320px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 900px;
+      margin: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    input {
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    label {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    input, select {
       width: 100%;
       padding: 8px;
-      margin: 6px 0;
+      margin-top: 4px;
     }
     button {
+      margin-top: 20px;
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       background: #ee4d2d;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
     }
-    h2 {
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
       text-align: center;
     }
-    .resultado {
-      margin-top: 10px;
+    th {
+      background: #f2f2f2;
+    }
+    .destaque {
+      background: #fff3ef;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-<div class="box">
-  <h2>Precificação Shopee</h2>
+<h1>Calculadora de Precificação Shopee</h1>
 
-  <input type="number" id="custo" placeholder="Custo do produto (R$)">
-  <input type="number" id="embalagem" placeholder="Embalagem (R$)">
-  <input type="number" id="taxa" placeholder="Taxa Shopee (%)" value="20">
-  <input type="number" id="lucro" placeholder="Lucro desejado (%)" value="30">
+<div class="container">
+  <div class="grid">
+    <div>
+      <label>Custo do produto (R$)</label>
+      <input type="number" id="custo" step="0.01">
+    </div>
 
-  <button onclick="calcular()">Calcular</button>
+    <div>
+      <label>Embalagem (R$)</label>
+      <input type="number" id="embalagem" step="0.01">
+    </div>
 
-  <div class="resultado" id="resultado"></div>
+    <div>
+      <label>Tipo de conta</label>
+      <select id="tipo">
+        <option value="cpf">CPF (20%)</option>
+        <option value="cnpj">CNPJ (14%)</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Frete grátis?</label>
+      <select id="frete">
+        <option value="nao">Não</option>
+        <option value="sim">Sim</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Lucro desejado (%)</label>
+      <input type="number" id="lucro" value="30">
+    </div>
+  </div>
+
+  <button onclick="calcular()">Calcular Precificação</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Descrição</th>
+        <th>Valor (R$)</th>
+        <th>% Aplicado</th>
+      </tr>
+    </thead>
+    <tbody id="resultado"></tbody>
+  </table>
 </div>
 
 <script>
 function calcular() {
   const custo = Number(document.getElementById('custo').value);
   const embalagem = Number(document.getElementById('embalagem').value);
-  const taxa = Number(document.getElementById('taxa').value);
   const lucro = Number(document.getElementById('lucro').value);
+  const tipo = document.getElementById('tipo').value;
+  const frete = document.getElementById('frete').value;
 
-  const total = custo + embalagem;
-  const preco = total / (1 - (taxa + lucro) / 100);
-  const lucroReal = preco - total - (preco * taxa / 100);
+  let comissao = tipo === 'cpf' ? 20 : 14;
+  let imposto = tipo === 'cnpj' ? 6 : 0;
+  let taxaFrete = frete === 'sim' ? 5 : 0;
+
+  const custoTotal = custo + embalagem;
+  const percentualTotal = comissao + imposto + taxaFrete + lucro;
+  const precoVenda = custoTotal / (1 - percentualTotal / 100);
 
   document.getElementById('resultado').innerHTML = `
-    Preço de venda: R$ ${preco.toFixed(2)} <br>
-    Lucro estimado: R$ ${lucroReal.toFixed(2)}
+    <tr><td>Custo do produto</td><td>R$ ${custo.toFixed(2)}</td><td>-</td></tr>
+    <tr><td>Embalagem</td><td>R$ ${embalagem.toFixed(2)}</td><td>-</td></tr>
+    <tr><td>Comissão Shopee</td><td>R$ ${(precoVenda * comissao / 100).toFixed(2)}</td><td>${comissao}%</td></tr>
+    <tr><td>Impostos</td><td>R$ ${(precoVenda * imposto / 100).toFixed(2)}</td><td>${imposto}%</td></tr>
+    <tr><td>Frete grátis</td><td>R$ ${(precoVenda * taxaFrete / 100).toFixed(2)}</td><td>${taxaFrete}%</td></tr>
+    <tr class="destaque"><td>Lucro</td><td>R$ ${(precoVenda * lucro / 100).toFixed(2)}</td><td>${lucro}%</td></tr>
+    <tr class="destaque"><td>Preço de venda sugerido</td><td colspan="2">R$ ${precoVenda.toFixed(2)}</td></tr>
   `;
 }
 </script>
 
 </body>
 </html>
-
